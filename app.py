@@ -301,8 +301,6 @@ with col1:
 
 with col2:
 
-    with col2:
-
     st.markdown("### Lesson Activities")
 
     activity1 = st.selectbox(
