@@ -337,7 +337,119 @@ The activities should naturally progress from easier to more challenging tasks.
 
 Encourage collaboration, peer feedback, and critical thinking where appropriate.
 
-Produce the output in a professional format suitable for university teachers.
+Return the lesson using EXACTLY the following format.
+
+Do NOT omit any heading.
+
+If a section is empty, write "Not Applicable".
+
+# Lesson Overview
+
+---
+
+# Learning Objectives
+
+---
+
+# Success Criteria
+
+---
+
+# Prior Knowledge
+
+---
+
+# Materials Required
+
+---
+
+# Lesson Plan
+
+| Time | Teacher Activities | Student Activities | Resources | Bloom's Level |
+
+---
+
+# Guided Practice
+
+Teacher Instructions
+
+Student Instructions
+
+Resources
+
+Time
+
+---
+
+# Activity 1 (Beginner)
+
+Objective
+
+Teacher Instructions
+
+Student Instructions
+
+Resources
+
+Duration
+
+Bloom's Level
+
+Expected Learning Outcome
+
+---
+
+# Activity 2 (Intermediate)
+
+Objective
+
+Teacher Instructions
+
+Student Instructions
+
+Resources
+
+Duration
+
+Bloom's Level
+
+Expected Learning Outcome
+
+---
+
+# Activity 3 (Advanced)
+
+Objective
+
+Teacher Instructions
+
+Student Instructions
+
+Resources
+
+Duration
+
+Bloom's Level
+
+Expected Learning Outcome
+
+---
+
+# Formative Assessment
+
+---
+
+# Exit Ticket
+
+---
+
+# Homework
+
+---
+
+# Teacher Reflection
+
+Generate ALL sections.
 
 """
 
