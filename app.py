@@ -133,11 +133,11 @@ with col1:
         "Course Title",
         [
             "Functional English",
-            "English Comprehension",
+            "Expository Writing",
+            "English I",
+            "Technical Business Writing",
             "Communication Skills",
-            "Academic Writing",
-            "Business Communication",
-            "Technical Writing"
+            "Presentation Skills"
         ]
     )
 
@@ -159,6 +159,7 @@ with col1:
             "Second Year",
             "Third Year",
             "Fourth Year"
+            "Fifth Year"
         ]
     )
 
@@ -170,6 +171,7 @@ with col2:
             "40 Minutes",
             "60 Minutes",
             "90 Minutes"
+            "110 Minutes"
         ]
     )
 
