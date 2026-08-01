@@ -301,9 +301,26 @@ with col1:
 
 with col2:
 
-    topic = st.selectbox(
-        "Lesson Topic",
-        topics[skill]
+    with col2:
+
+    st.markdown("### Lesson Activities")
+
+    activity1 = st.selectbox(
+        "🟢 Activity 1 (Beginner)",
+        topics[skill],
+        key="activity1"
+    )
+
+    activity2 = st.selectbox(
+        "🟡 Activity 2 (Intermediate)",
+        topics[skill],
+        key="activity2"
+    )
+
+    activity3 = st.selectbox(
+        "🔴 Activity 3 (Advanced)",
+        topics[skill],
+        key="activity3"
     )
 
 lesson_focus = st.selectbox(
