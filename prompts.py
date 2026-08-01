@@ -134,11 +134,94 @@ Resources
 
 Bloom's Level
 
-7. Beginner Activity
+=========================================================
+DIFFERENTIATED LEARNING ACTIVITIES (COMPULSORY)
+=========================================================
 
-8. Intermediate Activity
+The lesson MUST contain ALL FOUR sections below.
 
-9. Advanced Activity
+Do NOT omit any section.
+
+---------------------------------------------------------
+Guided Practice (Teacher Modelling)
+---------------------------------------------------------
+
+Duration
+
+Teacher Instructions
+
+Student Instructions
+
+Resources Required
+
+Bloom's Taxonomy Level
+
+---------------------------------------------------------
+Activity 1 – Beginner
+---------------------------------------------------------
+
+Objective
+
+Teacher Instructions
+
+Student Instructions
+
+Resources
+
+Duration
+
+Bloom's Taxonomy Level
+
+Expected Learning Outcome
+
+---------------------------------------------------------
+Activity 2 – Intermediate
+---------------------------------------------------------
+
+Objective
+
+Teacher Instructions
+
+Student Instructions
+
+Resources
+
+Duration
+
+Bloom's Taxonomy Level
+
+Expected Learning Outcome
+
+---------------------------------------------------------
+Activity 3 – Advanced
+---------------------------------------------------------
+
+Objective
+
+Teacher Instructions
+
+Student Instructions
+
+Resources
+
+Duration
+
+Bloom's Taxonomy Level
+
+Expected Learning Outcome
+
+---------------------------------------------------------
+
+All activities should become progressively more difficult.
+
+Activity 1 should target low proficiency learners.
+
+Activity 2 should target average learners.
+
+Activity 3 should target high-achieving learners.
+
+Use discipline-specific examples based on the selected programme.
+
 
 The activities should progressively increase in difficulty.
 
@@ -210,9 +293,49 @@ Use active learning.
 
 Avoid lecture-heavy teaching.
 
-Encourage collaboration.
+Every lesson should follow the sequence:
 
-Make the lesson highly engaging.
+Teacher Modelling
+
+↓
+
+Guided Practice
+
+↓
+
+Activity 1 (Support)
+
+↓
+
+Activity 2 (Collaborative)
+
+↓
+
+Activity 3 (Independent Challenge)
+
+↓
+
+Exit Ticket
+
+Every activity must clearly state:
+
+• Objective
+
+• Teacher Instructions
+
+• Student Instructions
+
+• Time Required
+
+• Resources
+
+• Bloom's Level
+
+• Expected Learning Outcome
+
+The activities should naturally progress from easier to more challenging tasks.
+
+Encourage collaboration, peer feedback, and critical thinking where appropriate.
 
 Produce the output in a professional format suitable for university teachers.
 
