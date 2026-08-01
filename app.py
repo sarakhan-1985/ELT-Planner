@@ -168,9 +168,6 @@ with col2:
     duration = st.selectbox(
         "Lesson Duration",
         [
-          duration = st.selectbox(
-    "Lesson Duration",
-    [
         "40 Minutes",
         "60 Minutes",
         "90 Minutes",
