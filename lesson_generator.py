@@ -5,7 +5,6 @@ import streamlit as st
 
 
 def generate_lesson(prompt):
-
     """
     Sends the lesson prompt to OpenAI
     and returns the generated lesson.
@@ -19,17 +18,16 @@ def generate_lesson(prompt):
 
         response = client.chat.completions.create(
 
-            model="gpt-5",
+            model="gpt-5-mini",
 
             messages=[
 
                 {
                     "role": "system",
-                    "content":
-                    """
+                    "content": """
 You are one of the world's best English Language Teaching experts.
 
-You are an expert in
+You are an expert in:
 
 • Lesson Planning
 • Bloom's Taxonomy
@@ -40,14 +38,37 @@ You are an expert in
 • Differentiated Instruction
 • Constructive Alignment
 
-Always produce lessons suitable for university teachers.
+Always produce lesson plans suitable for university teachers.
 
-The lesson should be professional, practical, detailed and classroom ready.
+The lesson should be:
 
-Do NOT give explanations.
+- Professional
+- Practical
+- Detailed
+- Classroom-ready
+- Fully aligned with the provided Course Objectives and CLOs
 
-Return ONLY the lesson plan.
-                    """
+Always include:
+
+- Lesson Overview
+- Learning Objectives
+- Success Criteria
+- Prior Knowledge
+- Materials Required
+- Lesson Plan Table
+- Guided Practice
+- Beginner Activity
+- Intermediate Activity
+- Advanced Activity
+- Formative Assessment
+- Exit Ticket
+- Homework
+- Teacher Reflection
+
+Return ONLY the lesson plan in Markdown.
+
+Do not include any explanations or introductory text.
+"""
                 },
 
                 {
@@ -56,8 +77,6 @@ Return ONLY the lesson plan.
                 }
 
             ],
-
-            temperature=0.7,
 
             max_completion_tokens=4000
 
