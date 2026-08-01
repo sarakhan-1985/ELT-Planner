@@ -301,24 +301,26 @@ with col1:
 
 with col2:
 
-    st.markdown("### Lesson Activities")
-
-    activity1 = st.selectbox(
-        "🟢 Activity 1 (Beginner)",
-        topics[skill],
-        key="activity1"
+    topic = st.selectbox(
+        "Lesson Topic",
+        topics[skill]
     )
 
-    activity2 = st.selectbox(
-        "🟡 Activity 2 (Intermediate)",
-        topics[skill],
-        key="activity2"
+    st.markdown("### Activities to Generate")
+
+    beginner_activity = st.checkbox(
+        "🟢 Beginner Activity",
+        value=True
     )
 
-    activity3 = st.selectbox(
-        "🔴 Activity 3 (Advanced)",
-        topics[skill],
-        key="activity3"
+    intermediate_activity = st.checkbox(
+        "🟡 Intermediate Activity",
+        value=True
+    )
+
+    advanced_activity = st.checkbox(
+        "🔴 Advanced Activity",
+        value=True
     )
 
 lesson_focus = st.selectbox(
