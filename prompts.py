@@ -76,7 +76,62 @@ Language Skill:
 
 Topic:
 {topic}
+-------------------------------------------------------
+DIFFERENTIATED ACTIVITIES
+-------------------------------------------------------
 
+For the topic "{topic}", generate ALL of the following:
+
+🟢 Beginner Activity
+
+Create one easy activity suitable for struggling learners.
+
+Include:
+
+- Objective
+- Teacher Instructions
+- Student Instructions
+- Resources
+- Time
+- Bloom's Level
+
+-------------------------------------------------------
+
+🟡 Intermediate Activity
+
+Create one collaborative activity for average learners.
+
+Include:
+
+- Objective
+- Teacher Instructions
+- Student Instructions
+- Resources
+- Time
+- Bloom's Level
+
+-------------------------------------------------------
+
+🔴 Advanced Activity
+
+Create one higher-order thinking activity.
+
+Include:
+
+- Objective
+- Teacher Instructions
+- Student Instructions
+- Resources
+- Time
+- Bloom's Level
+
+-------------------------------------------------------
+
+All three activities MUST teach the SAME lesson topic.
+
+The activities should increase in difficulty.
+
+Never omit any activity.
 Lesson Focus:
 {lesson_focus}
 
