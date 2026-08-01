@@ -168,12 +168,16 @@ with col2:
     duration = st.selectbox(
         "Lesson Duration",
         [
-            "40 Minutes",
-            "60 Minutes",
-            "90 Minutes"
-            "110 Minutes"
-        ]
-    )
+          duration = st.selectbox(
+    "Lesson Duration",
+    [
+        "40 Minutes",
+        "60 Minutes",
+        "90 Minutes",
+        "110 Minutes"
+    ]
+)
+    
 
     class_size = st.number_input(
         "Class Size",
