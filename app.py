@@ -178,7 +178,6 @@ with col2:
     ]
 )
     
-
     class_size = st.number_input(
         "Class Size",
         min_value=5,
