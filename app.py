@@ -68,38 +68,6 @@ st.sidebar.image(
     width=80
 )
 
-st.sidebar.title("ELT Planner AI")
-
-menu = st.sidebar.radio(
-    "Navigation",
-    [
-        "🏠 Home",
-        "📚 Generate Lesson",
-        "ℹ About"
-    ]
-)
-
-st.sidebar.markdown("---")
-
-st.sidebar.info(
-"""
-**Version 1.0**
-
-Developed for English Language Teachers
-
-Features
-
-✔ Bloom's Taxonomy
-
-✔ AI Lesson Planning
-
-✔ CLO Alignment
-
-✔ Differentiated Activities
-
-✔ Prompt Engineering
-"""
-)
 
 # --------------------------------------------------
 # HOME PAGE HEADER
