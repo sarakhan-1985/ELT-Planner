@@ -1,234 +1,50 @@
 import streamlit as st
 
-from io import BytesIO
-from docx import Document
-from docx.shared import Inches, Pt
 from prompts import build_prompt
 from lesson_generator import generate_lesson
 
 
 # --------------------------------------------------
-# HELPER FUNCTIONS
+# HELPER FUNCTION
 # --------------------------------------------------
 
-def clean_markdown_text(text):
-    """
-    Remove common Markdown formatting for the Word file.
-    """
-    if not text:
+def normalize_lesson_text(lesson):
+    """Return lesson content as a reliable plain-text string."""
+    if lesson is None:
         return ""
 
-    replacements = {
-        "**": "",
-        "__": "",
-        "`": "",
-        "### ": "",
-        "## ": "",
-        "# ": ""
-    }
+    if isinstance(lesson, str):
+        return lesson.strip()
 
-    cleaned_text = text
+    if isinstance(lesson, dict):
+        for key in ("content", "text", "lesson", "output_text", "response"):
+            value = lesson.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
 
-    for old, new in replacements.items():
-        cleaned_text = cleaned_text.replace(old, new)
+        choices = lesson.get("choices")
+        if isinstance(choices, list) and choices:
+            first = choices[0]
+            if isinstance(first, dict):
+                message = first.get("message", {})
+                if isinstance(message, dict):
+                    content = message.get("content")
+                    if isinstance(content, str):
+                        return content.strip()
 
-    return cleaned_text.strip()
+    output_text = getattr(lesson, "output_text", None)
+    if isinstance(output_text, str) and output_text.strip():
+        return output_text.strip()
 
+    choices = getattr(lesson, "choices", None)
+    if choices:
+        first = choices[0]
+        message = getattr(first, "message", None)
+        content = getattr(message, "content", None)
+        if isinstance(content, str):
+            return content.strip()
 
-def is_markdown_separator_row(cells):
-    """
-    Check whether a Markdown table row is a separator row.
-    Example:
-    |---|---|---|
-    """
-    return all(
-        cell.replace("-", "").replace(":", "").strip() == ""
-        for cell in cells
-    )
-
-
-def markdown_to_word(lesson_text):
-    """
-    Convert generated Markdown lesson-plan content into a Word document.
-    """
-    document = Document()
-
-    section = document.sections[0]
-    section.top_margin = Inches(0.6)
-    section.bottom_margin = Inches(0.6)
-    section.left_margin = Inches(0.6)
-    section.right_margin = Inches(0.6)
-
-    title = document.add_heading("ELT Lesson Plan", level=0)
-    title.alignment = 1
-
-    lines = lesson_text.splitlines()
-    index = 0
-
-    while index < len(lines):
-        line = lines[index].strip()
-
-        if not line:
-            index += 1
-            continue
-
-        # ------------------------------------------
-        # MARKDOWN TABLE
-        # ------------------------------------------
-
-        if (
-            line.startswith("|")
-            and line.endswith("|")
-            and line.count("|") >= 2
-        ):
-            table_lines = []
-
-            while index < len(lines):
-                current_line = lines[index].strip()
-
-                if (
-                    current_line.startswith("|")
-                    and current_line.endswith("|")
-                ):
-                    table_lines.append(current_line)
-                    index += 1
-                else:
-                    break
-
-            rows = []
-
-            for table_line in table_lines:
-                cells = [
-                    clean_markdown_text(cell.strip())
-                    for cell in table_line.strip("|").split("|")
-                ]
-
-                if not is_markdown_separator_row(cells):
-                    rows.append(cells)
-
-            if rows:
-                column_count = max(len(row) for row in rows)
-
-                word_table = document.add_table(
-                    rows=1,
-                    cols=column_count
-                )
-
-                word_table.style = "Table Grid"
-
-                # Header row
-                header_cells = word_table.rows[0].cells
-
-                for column_index in range(column_count):
-                    header_text = (
-                        rows[0][column_index]
-                        if column_index < len(rows[0])
-                        else ""
-                    )
-
-                    header_cells[column_index].text = header_text
-
-                    for paragraph in header_cells[column_index].paragraphs:
-                        for run in paragraph.runs:
-                            run.bold = True
-                            run.font.size = Pt(9)
-
-                # Data rows
-                for row_data in rows[1:]:
-                    row_cells = word_table.add_row().cells
-
-                    for column_index in range(column_count):
-                        cell_text = (
-                            row_data[column_index]
-                            if column_index < len(row_data)
-                            else ""
-                        )
-
-                        row_cells[column_index].text = cell_text
-
-                        for paragraph in row_cells[column_index].paragraphs:
-                            for run in paragraph.runs:
-                                run.font.size = Pt(8)
-
-                document.add_paragraph()
-
-            continue
-
-        # ------------------------------------------
-        # HEADINGS
-        # ------------------------------------------
-
-        if line.startswith("### "):
-            document.add_heading(
-                clean_markdown_text(line),
-                level=3
-            )
-
-        elif line.startswith("## "):
-            document.add_heading(
-                clean_markdown_text(line),
-                level=2
-            )
-
-        elif line.startswith("# "):
-            heading_text = clean_markdown_text(line)
-
-            if heading_text.lower() != "lesson plan":
-                document.add_heading(
-                    heading_text,
-                    level=1
-                )
-
-        # ------------------------------------------
-        # BULLET POINTS
-        # ------------------------------------------
-
-        elif line.startswith("- ") or line.startswith("* "):
-            paragraph = document.add_paragraph(
-                style="List Bullet"
-            )
-
-            paragraph.add_run(
-                clean_markdown_text(line[2:])
-            )
-
-        # ------------------------------------------
-        # NUMBERED LISTS
-        # ------------------------------------------
-
-        elif (
-            len(line) > 2
-            and line[0].isdigit()
-            and "." in line[:4]
-        ):
-            paragraph = document.add_paragraph(
-                style="List Number"
-            )
-
-            content = line.split(".", 1)[1].strip()
-
-            paragraph.add_run(
-                clean_markdown_text(content)
-            )
-
-        # ------------------------------------------
-        # NORMAL TEXT
-        # ------------------------------------------
-
-        else:
-            paragraph = document.add_paragraph()
-
-            paragraph.add_run(
-                clean_markdown_text(line)
-            )
-
-        index += 1
-
-    output = BytesIO()
-    document.save(output)
-    output.seek(0)
-
-    return output.getvalue()
+    return str(lesson).strip()
 
 
 # --------------------------------------------------
@@ -286,11 +102,6 @@ st.markdown(
         color: white;
     }
 
-    div[data-testid="stDownloadButton"] button {
-        min-height: 50px;
-        font-size: 16px;
-        font-weight: 600;
-    }
 
     </style>
     """,
@@ -761,7 +572,11 @@ if generate:
                     detailed_table
                 )
 
-                lesson = generate_lesson(prompt)
+                raw_lesson = generate_lesson(prompt)
+                lesson = normalize_lesson_text(raw_lesson)
+
+                if not lesson:
+                    raise ValueError("The AI returned an empty lesson plan.")
 
                 st.session_state["generated_lesson"] = lesson
 
@@ -777,32 +592,18 @@ if generate:
 
 
 # --------------------------------------------------
-# DISPLAY AND DOWNLOAD GENERATED LESSON
+# DISPLAY GENERATED LESSON
 # --------------------------------------------------
 
 if "generated_lesson" in st.session_state:
-    lesson = st.session_state["generated_lesson"]
+    lesson = normalize_lesson_text(
+        st.session_state["generated_lesson"]
+    )
+
+    if not lesson:
+        st.error("No lesson-plan content is available to display.")
+        st.stop()
 
     st.markdown("---")
     st.markdown("## 📚 Generated Lesson Plan")
     st.markdown(lesson)
-
-    try:
-        word_file = markdown_to_word(lesson)
-
-        st.download_button(
-            label="📘 Download Lesson Plan as Word",
-            data=word_file,
-            file_name="ELT_Lesson_Plan.docx",
-            mime=(
-                "application/vnd.openxmlformats-officedocument."
-                "wordprocessingml.document"
-            ),
-            use_container_width=True
-        )
-
-    except Exception as export_error:
-        st.warning(
-            "The lesson plan was generated, but the Word file "
-            f"could not be created. Error: {export_error}"
-        )
