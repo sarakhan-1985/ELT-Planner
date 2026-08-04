@@ -19,152 +19,126 @@ def build_prompt(
     blooms,
     teacher_prompt
 ):
-    """Build a detailed prompt for generating a professional ELT lesson plan."""
-    # Default activity settings
-    # These are defined here because app.py does not pass them to build_prompt().
-    selected_activities = ["Beginner", "Intermediate", "Advanced"]
+    """
+    Build a professional ELT lesson-plan prompt.
 
-    # Present activities in bullet points
-    activity_bullet_points = True
+    This function matches the arguments currently passed
+    from app.py.
+    """
 
-    # Include teacher and student roles
-    include_teacher_role = True
-    include_student_role = True
+    # --------------------------------------------------
+    # FORMAT USER INPUTS
+    # --------------------------------------------------
 
-    # Include assessment for each activity
-    include_activity_assessment = True
     learning_style_text = (
-        ", ".join(learning_style) if learning_style else "Not specified"
+        ", ".join(learning_style)
+        if learning_style
+        else "Not specified"
     )
+
     resources_text = (
-        ", ".join(resources) if resources else "Standard classroom resources"
+        ", ".join(resources)
+        if resources
+        else "Standard classroom resources"
     )
-    blooms_text = ", ".join(blooms) if blooms else "Not specified"
-    selected_activities_text = (
-        ", ".join(selected_activities)
-        if selected_activities
-        else "No differentiated activity level selected"
+
+    blooms_text = (
+        ", ".join(blooms)
+        if blooms
+        else "Not specified"
     )
+
     course_objectives_text = (
         course_objectives.strip()
         if course_objectives and course_objectives.strip()
         else "Not provided"
     )
+
     clos_text = (
-        clos.strip() if clos and clos.strip() else "Not provided"
+        clos.strip()
+        if clos and clos.strip()
+        else "Not provided"
     )
+
     teacher_prompt_text = (
         teacher_prompt.strip()
         if teacher_prompt and teacher_prompt.strip()
         else "No additional teacher instructions provided"
     )
 
-    if activity_bullet_points:
-        activity_format_instruction = """
-Present each differentiated activity using clear, sufficiently detailed bullet points.
-Do not reduce instructions to vague phrases or one-line descriptions.
-"""
-    else:
-        activity_format_instruction = """
-Present each differentiated activity under clear subheadings with sufficient detail.
-"""
-
-    if include_teacher_role:
-        teacher_role_instruction = """
-For Guided Practice and every selected differentiated activity, include a clearly labelled **Teacher Role**.
-Explain what the teacher introduces, models, instructs, monitors, asks, and how feedback or correction is provided.
-"""
-    else:
-        teacher_role_instruction = """
-A separately labelled Teacher Role is not required.
-"""
-
-    if include_student_role:
-        student_role_instruction = """
-For Guided Practice and every selected differentiated activity, include a clearly labelled **Student Role**.
-Explain what students do, how they are grouped, what steps they follow, what they produce, and how they respond to feedback.
-"""
-    else:
-        student_role_instruction = """
-A separately labelled Student Role is not required.
-"""
-
-    if include_activity_assessment:
-        assessment_instruction = """
-For Guided Practice and every selected differentiated activity, include a clearly labelled **Assessment** section stating:
-- what is assessed;
-- how evidence is collected;
-- the success indicator;
-- how feedback is provided;
-- which learning objective is measured.
-"""
-    else:
-        assessment_instruction = """
-Activity-level assessment may be omitted; retain the main Formative Assessment section.
-"""
-
-    activity_sections = []
-
-    if "Beginner" in selected_activities:
-        activity_sections.append("""
-### Activity 1 — Beginner
-Create one scaffolded activity for learners requiring support. Use manageable input, examples, prompts, sentence frames, and teacher support. It must address the main lesson objective.
-""")
-
-    if "Intermediate" in selected_activities:
-        activity_sections.append("""
-### Activity 2 — Intermediate
-Create one collaborative activity for core learners. Use pair or group work, application of the target skill, peer discussion or feedback, and a realistic discipline-specific task.
-""")
-
-    if "Advanced" in selected_activities:
-        activity_sections.append("""
-### Activity 3 — Advanced
-Create one higher-order, independent or stretch activity. Require analysis, evaluation or creation, greater independence, justification, adaptation or problem-solving.
-""")
-
-    selected_activity_sections = "\n".join(activity_sections)
+    # --------------------------------------------------
+    # BUILD PROMPT
+    # --------------------------------------------------
 
     prompt = f"""
-You are an expert English Language Teaching curriculum designer, teacher educator and Head of Department with more than 20 years of experience in higher education.
+You are an expert English Language Teaching curriculum designer with more than 20 years of experience in higher education.
 
-Develop a professional, practical, detailed and constructively aligned English language lesson plan.
+Develop a professional, practical, detailed and constructively aligned English-language lesson plan.
 
 =========================================================
 COURSE INFORMATION
 =========================================================
 
-Course: {course}
-Programme: {programme}
-Undergraduate Level: {year}
-Lesson Duration: {duration}
-Class Size: {class_size}
-Student English Proficiency: {proficiency}
+Course:
+{course}
+
+Programme:
+{programme}
+
+Undergraduate Level:
+{year}
+
+Lesson Duration:
+{duration}
+
+Class Size:
+{class_size}
+
+Student English Proficiency:
+{proficiency}
 
 =========================================================
 CURRICULUM ALIGNMENT
 =========================================================
 
 Course Objectives:
+
 {course_objectives_text}
 
 Course Learning Outcomes:
+
 {clos_text}
 
-Do not invent course objectives or CLOs when they are not provided.
+Use only the course objectives and CLOs provided by the teacher.
+
+Do not invent course objectives or CLOs when they have not been provided.
+
+Where relevant, identify which course objective and CLO are addressed by the lesson.
 
 =========================================================
 LESSON DETAILS
 =========================================================
 
-Language Skill: {skill}
-Topic: {topic}
-Lesson Focus: {lesson_focus}
-Teaching Mode: {delivery}
-Preferred Learning Strategies: {learning_style_text}
-Available Resources: {resources_text}
-Selected Bloom's Taxonomy Levels: {blooms_text}
-Selected Differentiated Activity Levels: {selected_activities_text}
+Language Skill:
+{skill}
+
+Topic:
+{topic}
+
+Lesson Focus:
+{lesson_focus}
+
+Teaching Mode:
+{delivery}
+
+Preferred Learning Strategies:
+{learning_style_text}
+
+Available Resources:
+{resources_text}
+
+Selected Bloom's Taxonomy Levels:
+{blooms_text}
 
 =========================================================
 ADDITIONAL TEACHER INSTRUCTIONS
@@ -172,113 +146,405 @@ ADDITIONAL TEACHER INSTRUCTIONS
 
 {teacher_prompt_text}
 
+Follow the additional instructions where they are relevant, practical and consistent with the lesson duration.
+
 =========================================================
 CONSTRUCTIVE ALIGNMENT
 =========================================================
 
-Align course objectives, CLOs, lesson objectives, success criteria, teaching activities, Bloom's levels, formative assessment and the exit ticket.
-Write three to five measurable learning objectives using observable Bloom's verbs. Avoid vague verbs such as know, learn, or become familiar with.
+Ensure clear alignment among:
+
+- course objectives;
+- course learning outcomes;
+- lesson learning objectives;
+- success criteria;
+- teaching and learning activities;
+- Bloom's Taxonomy levels;
+- formative assessment;
+- exit ticket;
+- homework.
+
+Write three to five measurable learning objectives.
+
+Use observable and assessable Bloom's Taxonomy verbs.
+
+Avoid vague verbs such as:
+
+- know;
+- learn;
+- understand;
+- become familiar with;
+- appreciate.
+
+Each learning objective should clearly state what students will be able to do by the end of the lesson.
 
 =========================================================
-DETAILED LESSON PLAN TABLE
+LESSON DESIGN REQUIREMENTS
 =========================================================
 
-Present the complete lesson procedure as a valid Markdown table using exactly these columns:
+The lesson must:
 
-| Time | Teacher Activities | Student Activities | Resources | Bloom's Level |
-|---|---|---|---|---|
+- be suitable for the selected undergraduate level;
+- match the stated English proficiency level;
+- be realistic for the stated class size;
+- fit the selected lesson duration;
+- match the selected teaching mode;
+- use only the listed classroom resources;
+- incorporate the selected learning strategies;
+- address the selected Bloom's Taxonomy levels;
+- use examples relevant to the selected academic programme;
+- include active student participation;
+- include clear instructions;
+- include realistic expected student output;
+- include formative checks for learning;
+- include feedback opportunities;
+- include an exit ticket.
 
-Table rules:
-- Put each lesson stage in a separate row and each row on a new line.
-- Include exactly five cells in every row.
-- Keep the table detailed enough for a teacher to conduct the lesson directly from it.
-- In Teacher Activities, explain what is introduced, modelled, instructed, questioned, monitored and corrected.
-- In Student Activities, explain what students read, discuss, practise, produce, submit, share or present.
-- Use semicolons inside cells to preserve detail without creating extra rows.
-- Keep concrete examples, expected output, monitoring, feedback and assessment evidence.
-- Ensure the total time equals {duration}.
-- Include all selected differentiated activities in the table.
-
-Follow this sequence where appropriate:
-Warm-up → Objectives and Success Criteria → Teacher Modelling → Guided Practice → Selected Differentiated Activities → Formative Assessment and Feedback → Review → Exit Ticket → Homework Explanation.
-
-=========================================================
-GUIDED PRACTICE
-=========================================================
-
-Include purpose, modelling, teacher instructions, student instructions, resources, duration, Bloom's level, checks for understanding and expected student response.
-
-{teacher_role_instruction}
-
-{student_role_instruction}
-
-{assessment_instruction}
-
-=========================================================
-DIFFERENTIATED ACTIVITIES
-=========================================================
-
-Generate only these selected activity levels:
-{selected_activities_text}
-
-All selected activities must teach the same lesson topic and main objective while increasing progressively in complexity, cognitive demand and independence.
-Use discipline-specific examples suitable for {programme}.
-
-{selected_activity_sections}
-
-{activity_format_instruction}
-
-For every selected activity, include as applicable:
-- Objective
-- Teacher Role
-- Student Role
-- Teacher Instructions
-- Student Instructions
-- Resources
-- Duration
-- Bloom's Taxonomy Level
-- Expected Learning Outcome
-- Assessment Method
-- Success Indicator
-
-{teacher_role_instruction}
-
-{student_role_instruction}
-
-{assessment_instruction}
+Do not recommend tools or resources that are not listed as available unless the teacher specifically requests them.
 
 =========================================================
 DISCIPLINE-SPECIFIC CONTEXT
 =========================================================
 
-Use relevant examples from the selected programme whenever possible:
-- Computer Science, Software Engineering, Data Science or AI: programming, software development, algorithms, bug reports, cybersecurity, data and technical documentation.
-- Electrical Engineering: circuits, renewable energy, power systems, signals and technical specifications.
-- Civil Engineering: construction, infrastructure, surveying, sustainability and structural design.
-- Business Administration: marketing, leadership, entrepreneurship, management and business communication.
-- Accounting & Finance: financial statements, auditing, budgeting, taxation and financial reporting.
+Use authentic and relevant examples from the selected programme whenever appropriate.
 
-Do not force irrelevant technical examples.
+For Computer Science, Software Engineering, Data Science and Artificial Intelligence, examples may include:
+
+- programming;
+- algorithms;
+- software applications;
+- artificial intelligence;
+- cybersecurity;
+- data analysis;
+- technical documentation;
+- software problems;
+- digital communication.
+
+For Electrical Engineering, examples may include:
+
+- circuits;
+- signals;
+- power systems;
+- renewable energy;
+- electronic devices;
+- technical specifications.
+
+For Civil Engineering, examples may include:
+
+- construction;
+- infrastructure;
+- surveying;
+- sustainability;
+- structural design;
+- project reports;
+- site communication.
+
+For Business Administration, examples may include:
+
+- management;
+- marketing;
+- entrepreneurship;
+- leadership;
+- workplace communication;
+- business proposals;
+- customer communication.
+
+For Accounting and Finance, examples may include:
+
+- financial reports;
+- auditing;
+- budgeting;
+- taxation;
+- financial statements;
+- professional correspondence.
+
+Do not force discipline-specific examples when they are unnatural or irrelevant to the lesson topic.
 
 =========================================================
-ASSESSMENT AND REFLECTION
+DIFFERENTIATION
 =========================================================
 
-Include at least two formative assessment methods. Explain what is assessed, how evidence is collected, what success looks like, how feedback is provided, and which objective is measured.
+Provide three differentiated activities:
 
-Create an exit ticket taking no more than five minutes that directly measures the main objective and includes a clear success criterion.
+1. Beginner Activity
+2. Intermediate Activity
+3. Advanced Activity
 
-Provide a purposeful homework task with expected output, submission format and connection to the lesson objective. If inappropriate, write "Not Applicable."
+All three activities must:
 
-Provide three to five teacher-reflection questions addressing objectives, participation, differentiation, assessment evidence and improvements.
+- teach the same lesson topic;
+- address the same main learning objective;
+- increase progressively in difficulty;
+- be suitable for the selected programme;
+- be practical within the available lesson time;
+- include clear student instructions;
+- include the expected student output;
+- include a brief assessment method;
+- include a success indicator.
+
+Do not include separately labelled Teacher Role or Student Role sections.
+
+Instead, explain teacher actions and student actions naturally within the activity instructions.
+
+=========================================================
+BEGINNER ACTIVITY
+=========================================================
+
+Create one scaffolded activity for students requiring additional support.
+
+The activity should include:
+
+- manageable input;
+- a clear model or example;
+- guided practice;
+- prompts or clues;
+- sentence starters, templates or structured support where appropriate;
+- limited cognitive load;
+- clear expected output;
+- an observable success indicator.
+
+Use Bloom's levels appropriate for foundational learning, such as Remember, Understand or Apply, when selected.
+
+=========================================================
+INTERMEDIATE ACTIVITY
+=========================================================
+
+Create one activity for students working at the expected proficiency level.
+
+The activity should include:
+
+- pair work, group work or collaborative learning where appropriate;
+- application of the target skill;
+- meaningful student interaction;
+- a realistic discipline-specific task;
+- peer discussion or peer feedback where suitable;
+- clear expected output;
+- an observable success indicator.
+
+Use Bloom's levels such as Understand, Apply or Analyze when selected.
+
+=========================================================
+ADVANCED ACTIVITY
+=========================================================
+
+Create one higher-order activity for advanced or fast-progressing students.
+
+The activity should include:
+
+- greater independence;
+- analysis, evaluation, adaptation or creation;
+- justification of choices;
+- problem-solving;
+- a challenging discipline-specific context;
+- clear expected output;
+- an observable success indicator.
+
+Use Bloom's levels such as Analyze, Evaluate or Create when selected.
+
+=========================================================
+ACTIVITY FORMAT
+=========================================================
+
+Present the three differentiated activities using clear and readable bullet points.
+
+For each activity, include:
+
+- Activity Title
+- Objective
+- Instructions
+- Grouping
+- Resources
+- Duration
+- Bloom's Taxonomy Level
+- Expected Student Output
+- Assessment Method
+- Success Indicator
+
+Keep the instructions sufficiently detailed for a teacher to use directly.
+
+Do not use vague descriptions such as:
+
+- students practise;
+- teacher explains;
+- group discussion;
+- worksheet activity.
+
+State exactly what students will read, discuss, identify, revise, write, produce, present or submit.
+
+=========================================================
+DETAILED LESSON PLAN
+=========================================================
+
+Present the main lesson procedure as a valid Markdown table using exactly these columns:
+
+| Time | Teacher Activities | Student Activities | Resources | Bloom's Level |
+|---|---|---|---|---|
+
+Follow these table rules:
+
+- Put each lesson stage in a separate row.
+- Put every row on a new line.
+- Include exactly five cells in each row.
+- Do not add extra columns.
+- Do not merge cells.
+- Use semicolons inside cells instead of line breaks.
+- Ensure that the total allocated time equals {duration}.
+- Include concrete teacher instructions.
+- Include concrete student actions.
+- Include expected student responses or products.
+- Include checks for understanding.
+- Include feedback where appropriate.
+- Use only the available resources.
+- Include all three differentiated activities in the lesson sequence.
+- Match each activity with an appropriate selected Bloom's level.
+
+Use this lesson sequence where appropriate:
+
+1. Warm-up or retrieval practice
+2. Introduction of lesson objectives
+3. Success criteria
+4. Activation of prior knowledge
+5. Explanation or teacher modelling
+6. Guided practice
+7. Beginner differentiated activity
+8. Intermediate differentiated activity
+9. Advanced differentiated activity
+10. Formative assessment
+11. Feedback and correction
+12. Lesson review
+13. Exit ticket
+14. Homework explanation
+
+Adapt the sequence when required by the selected lesson focus.
+
+=========================================================
+GUIDED PRACTICE
+=========================================================
+
+Include a guided-practice stage before independent or differentiated activities.
+
+The guided practice should include:
+
+- its purpose;
+- a model or example;
+- step-by-step instructions;
+- checking questions;
+- expected student responses;
+- common errors;
+- corrective feedback;
+- available resources;
+- duration;
+- relevant Bloom's level.
+
+Do not include separately labelled Teacher Role or Student Role sections.
+
+=========================================================
+FORMATIVE ASSESSMENT
+=========================================================
+
+Include at least two formative assessment methods.
+
+For each assessment method, explain:
+
+- what is being assessed;
+- which learning objective is being measured;
+- how evidence of learning will be collected;
+- what successful performance looks like;
+- how feedback will be provided.
+
+Assessment methods may include, where appropriate:
+
+- questioning;
+- observation;
+- mini-whiteboard responses;
+- short written responses;
+- peer review;
+- checklist;
+- oral explanation;
+- error correction;
+- quick quiz;
+- sample analysis;
+- self-assessment;
+- exit ticket.
+
+Use only assessment methods suitable for the selected teaching mode and available resources.
+
+=========================================================
+EXIT TICKET
+=========================================================
+
+Create an exit ticket that:
+
+- takes no more than five minutes;
+- directly measures the main learning objective;
+- requires an observable student response;
+- includes a clear success criterion;
+- can be completed using the available resources.
+
+Do not use vague exit-ticket questions such as:
+
+- What did you learn today?
+- Did you understand the lesson?
+- Was the lesson useful?
+
+=========================================================
+HOMEWORK
+=========================================================
+
+Provide one purposeful homework task.
+
+State:
+
+- the task;
+- the expected output;
+- the approximate length or scope;
+- the submission format;
+- the connection to the lesson objective;
+- the assessment or success criterion.
+
+If homework is inappropriate for the lesson focus, write:
+
+Not Applicable.
+
+=========================================================
+TEACHER REFLECTION
+=========================================================
+
+Provide three to five reflection questions addressing:
+
+- achievement of learning objectives;
+- student participation;
+- effectiveness of differentiation;
+- evidence from formative assessment;
+- effectiveness of resources;
+- time management;
+- possible improvements.
 
 =========================================================
 OUTPUT FORMAT
 =========================================================
 
-Return the lesson using exactly these headings:
+Return the lesson plan using exactly these headings:
 
 # Lesson Overview
+
+Include:
+
+- Course
+- Programme
+- Undergraduate Level
+- Language Skill
+- Topic
+- Lesson Focus
+- Lesson Duration
+- Class Size
+- English Proficiency
+- Teaching Mode
+- Learning Strategies
+- Available Resources
+- Selected Bloom's Levels
+- Relevant Course Objective
+- Relevant CLO
 
 # Learning Objectives
 
@@ -297,6 +563,12 @@ Return the lesson using exactly these headings:
 
 # Differentiated Activities
 
+## Beginner Activity
+
+## Intermediate Activity
+
+## Advanced Activity
+
 # Formative Assessment
 
 # Exit Ticket
@@ -305,8 +577,27 @@ Return the lesson using exactly these headings:
 
 # Teacher Reflection
 
-Do not omit headings. If a section is not applicable, write "Not Applicable."
-Before returning the answer, verify that the table is valid Markdown, every row has exactly five cells, total time matches {duration}, only selected activities appear, roles and assessment follow the user's selected options, and no section is blank.
+Do not omit any heading.
+
+If a section is not applicable, write:
+
+Not Applicable.
+
+Before returning the lesson plan, verify that:
+
+- the Markdown table is correctly formatted;
+- every table row contains exactly five cells;
+- the total lesson time equals {duration};
+- all examples are appropriate for {programme};
+- the lesson matches the stated proficiency level;
+- only selected resources are used;
+- the learning objectives are measurable;
+- the success criteria directly match the learning objectives;
+- formative assessments measure the learning objectives;
+- the exit ticket measures the main objective;
+- the differentiated activities increase progressively in complexity;
+- no separately labelled Teacher Role or Student Role section appears;
+- no required section is blank.
 """
 
     return prompt
