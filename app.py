@@ -368,7 +368,12 @@ with activity_col2:
     )
 
     include_teacher_role = st.checkbox(
-        "Include teacher and student roles",
+        "Include teacher role",
+        value=True
+    )
+
+    include_student_role = st.checkbox(
+        "Include student role",
         value=True
     )
 
@@ -591,6 +596,7 @@ if generate:
                     selected_activities=selected_activities,
                     activity_bullet_points=activity_bullet_points,
                     include_teacher_role=include_teacher_role,
+                    include_student_role=include_student_role,
                     include_activity_assessment=include_activity_assessment
                 )
 
