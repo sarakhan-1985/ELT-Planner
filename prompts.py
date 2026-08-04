@@ -1,4 +1,4 @@
-```python
+
 # prompts.py
 
 
@@ -677,4 +677,4 @@ Before returning the answer, verify that:
 """
 
     return prompt
-```
+
