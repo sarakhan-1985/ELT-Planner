@@ -519,5 +519,41 @@ else:
     st.success("🟩 Prompt Quality: Excellent")
 
 st.divider()
+generate = st.button(
+    "🚀 Generate Professional Lesson Plan",
+    use_container_width=True
+)
 
+if generate:
+
+    with st.spinner("Generating your lesson..."):
+
+        prompt = build_prompt(
+
+            course,
+            programme,
+            year,
+            duration,
+            class_size,
+            proficiency,
+            course_objectives,
+            clos,
+            skill,
+            topic,
+            lesson_focus,
+            delivery,
+            learning_style,
+            resources,
+            blooms,
+            teacher_prompt
+
+        )
+
+        lesson = generate_lesson(prompt)
+
+        st.success("Lesson Generated Successfully!")
+
+        st.markdown("---")
+
+        st.markdown(lesson)
 
