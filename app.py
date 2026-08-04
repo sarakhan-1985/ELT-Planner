@@ -370,11 +370,6 @@ with col2:
         topics[skill]
     )
 
-    custom_topic = st.text_input(
-        "Custom Topic Optional",
-        placeholder="Enter a topic not listed above"
-    )
-
 final_topic = custom_topic.strip() if custom_topic.strip() else topic
 
 
@@ -413,22 +408,6 @@ with activity_col2:
             "clear and readable bullet points."
         )
     )
-
-    include_teacher_role = st.checkbox(
-        "Include teacher role",
-        value=True
-    )
-
-    include_student_role = st.checkbox(
-        "Include student role",
-        value=True
-    )
-
-    include_activity_assessment = st.checkbox(
-        "Include assessment for each activity",
-        value=True
-    )
-
 
 selected_activities = []
 
@@ -590,89 +569,4 @@ else:
 
 st.divider()
 
-
-# --------------------------------------------------
-# GENERATE LESSON PLAN
-# --------------------------------------------------
-
-generate = st.button(
-    "🚀 Generate Professional Lesson Plan",
-    use_container_width=True
-)
-
-if generate:
-    validation_errors = []
-
-    if not blooms:
-        validation_errors.append(
-            "Please select at least one Bloom's Taxonomy level."
-        )
-
-    if not selected_activities:
-        validation_errors.append(
-            "Please select at least one activity level."
-        )
-
-    if validation_errors:
-        for error in validation_errors:
-            st.error(error)
-    else:
-        with st.spinner("Generating your professional lesson plan..."):
-            try:
-                prompt = build_prompt(
-                    course=course,
-                    programme=programme,
-                    year=year,
-                    duration=duration,
-                    class_size=class_size,
-                    proficiency=proficiency,
-                    course_objectives=course_objectives,
-                    clos=clos,
-                    skill=skill,
-                    topic=final_topic,
-                    lesson_focus=lesson_focus,
-                    delivery=delivery,
-                    learning_style=learning_style,
-                    resources=resources,
-                    blooms=blooms,
-                    teacher_prompt=teacher_prompt,
-                    selected_activities=selected_activities,
-                    activity_bullet_points=activity_bullet_points,
-                    include_teacher_role=include_teacher_role,
-                    include_student_role=include_student_role,
-                    include_activity_assessment=include_activity_assessment
-                )
-
-                raw_lesson = generate_lesson(prompt)
-                lesson = normalize_lesson_text(raw_lesson)
-
-                if not lesson:
-                    raise ValueError(
-                        "The AI returned an empty response. Check your API key, "
-                        "model settings, and lesson_generator.py."
-                    )
-
-                st.session_state["generated_lesson"] = lesson
-                st.success("Lesson generated successfully!")
-
-            except Exception as error:
-                st.error(
-                    "The lesson plan could not be generated. "
-                    f"Error: {error}"
-                )
-
-
-# --------------------------------------------------
-# DISPLAY GENERATED LESSON
-# --------------------------------------------------
-
-if "generated_lesson" in st.session_state:
-    lesson = normalize_lesson_text(
-        st.session_state.get("generated_lesson")
-    )
-
-    if lesson:
-        st.markdown("---")
-        st.markdown("## 📚 Generated Lesson Plan")
-        st.markdown(lesson)
 
