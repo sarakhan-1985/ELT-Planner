@@ -17,15 +17,22 @@ def build_prompt(
     learning_style,
     resources,
     blooms,
-    teacher_prompt,
-    selected_activities,
-    activity_bullet_points,
-    include_teacher_role,
-    include_student_role,
-    include_activity_assessment
+    teacher_prompt
 ):
     """Build a detailed prompt for generating a professional ELT lesson plan."""
+    # Default activity settings
+    # These are defined here because app.py does not pass them to build_prompt().
+    selected_activities = ["Beginner", "Intermediate", "Advanced"]
 
+    # Present activities in bullet points
+    activity_bullet_points = True
+
+    # Include teacher and student roles
+    include_teacher_role = True
+    include_student_role = True
+
+    # Include assessment for each activity
+    include_activity_assessment = True
     learning_style_text = (
         ", ".join(learning_style) if learning_style else "Not specified"
     )
