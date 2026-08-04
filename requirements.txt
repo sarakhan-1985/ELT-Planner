@@ -4,3 +4,4 @@ python-docx
 pdfplumber
 PyPDF2
 pandas
+reportlab
