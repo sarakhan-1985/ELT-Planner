@@ -59,15 +59,6 @@ h2 {
 </style>
 """, unsafe_allow_html=True)
 
-# --------------------------------------------------
-# SIDEBAR
-# --------------------------------------------------
-
-st.sidebar.image(
-    "https://img.icons8.com/color/96/graduation-cap.png",
-    width=80
-)
-
 
 # --------------------------------------------------
 # HOME PAGE HEADER
@@ -126,7 +117,7 @@ with col1:
             "First Year",
             "Second Year",
             "Third Year",
-            "Fourth Year"
+            "Fourth Year",
             "Fifth Year"
         ]
     )
@@ -276,23 +267,40 @@ with col2:
         topics[skill]
     )
 
-    st.markdown("### Activities to Generate")
+  st.markdown("### Activities to Generate")
 
-    beginner_activity = st.checkbox(
-        "🟢 Beginner Activity",
-        value=True
-    )
+beginner_activity = st.checkbox(
+    "🟢 Beginner Activity",
+    value=True
+)
 
-    intermediate_activity = st.checkbox(
-        "🟡 Intermediate Activity",
-        value=True
-    )
+intermediate_activity = st.checkbox(
+    "🟡 Intermediate Activity",
+    value=True
+)
 
-    advanced_activity = st.checkbox(
-        "🔴 Advanced Activity",
-        value=True
-    )
+advanced_activity = st.checkbox(
+    "🔴 Advanced Activity",
+    value=True
+)
 
+activity_bullet_points = st.checkbox(
+    "• Present activities in bullet points",
+    value=True,
+    help="Each activity will be presented using clear, concise bullet points."
+)
+# Create a list of selected activity levels
+
+selected_activities = []
+
+if beginner_activity:
+    selected_activities.append("Beginner")
+
+if intermediate_activity:
+    selected_activities.append("Intermediate")
+
+if advanced_activity:
+    selected_activities.append("Advanced")
 lesson_focus = st.selectbox(
 
     "Lesson Focus",
