@@ -4,6 +4,53 @@ from prompts import build_prompt
 from lesson_generator import generate_lesson
 
 
+def normalize_lesson_text(result):
+    """Convert common AI response formats into displayable lesson text."""
+    if result is None:
+        return ""
+
+    if isinstance(result, str):
+        return result.strip()
+
+    if isinstance(result, dict):
+        for key in ("output_text", "text", "content", "lesson", "response"):
+            value = result.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+
+        choices = result.get("choices")
+        if isinstance(choices, list) and choices:
+            first = choices[0]
+            if isinstance(first, dict):
+                message = first.get("message", {})
+                if isinstance(message, dict):
+                    content = message.get("content")
+                    if isinstance(content, str) and content.strip():
+                        return content.strip()
+                text_value = first.get("text")
+                if isinstance(text_value, str) and text_value.strip():
+                    return text_value.strip()
+
+    output_text = getattr(result, "output_text", None)
+    if isinstance(output_text, str) and output_text.strip():
+        return output_text.strip()
+
+    choices = getattr(result, "choices", None)
+    if choices:
+        first = choices[0]
+        message = getattr(first, "message", None)
+        content = getattr(message, "content", None) if message else None
+        if isinstance(content, str) and content.strip():
+            return content.strip()
+
+        text_value = getattr(first, "text", None)
+        if isinstance(text_value, str) and text_value.strip():
+            return text_value.strip()
+
+    fallback = str(result).strip()
+    return fallback if fallback and fallback != "None" else ""
+
+
 # --------------------------------------------------
 # PAGE CONFIGURATION
 # --------------------------------------------------
@@ -554,7 +601,6 @@ generate = st.button(
 )
 
 if generate:
-
     validation_errors = []
 
     if not blooms:
@@ -570,11 +616,8 @@ if generate:
     if validation_errors:
         for error in validation_errors:
             st.error(error)
-
     else:
-
         with st.spinner("Generating your professional lesson plan..."):
-
             try:
                 prompt = build_prompt(
                     course=course,
@@ -600,18 +643,36 @@ if generate:
                     include_activity_assessment=include_activity_assessment
                 )
 
-                lesson = generate_lesson(prompt)
+                raw_lesson = generate_lesson(prompt)
+                lesson = normalize_lesson_text(raw_lesson)
 
+                if not lesson:
+                    raise ValueError(
+                        "The AI returned an empty response. Check your API key, "
+                        "model settings, and lesson_generator.py."
+                    )
+
+                st.session_state["generated_lesson"] = lesson
                 st.success("Lesson generated successfully!")
-
-                st.markdown("---")
-
-                st.markdown("## 📚 Generated Lesson Plan")
-
-                st.markdown(lesson)
 
             except Exception as error:
                 st.error(
                     "The lesson plan could not be generated. "
                     f"Error: {error}"
                 )
+
+
+# --------------------------------------------------
+# DISPLAY GENERATED LESSON
+# --------------------------------------------------
+
+if "generated_lesson" in st.session_state:
+    lesson = normalize_lesson_text(
+        st.session_state.get("generated_lesson")
+    )
+
+    if lesson:
+        st.markdown("---")
+        st.markdown("## 📚 Generated Lesson Plan")
+        st.markdown(lesson)
+
