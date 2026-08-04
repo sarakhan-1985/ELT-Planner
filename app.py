@@ -5,49 +5,6 @@ from lesson_generator import generate_lesson
 
 
 # --------------------------------------------------
-# HELPER FUNCTION
-# --------------------------------------------------
-
-def normalize_lesson_text(lesson):
-    """Return lesson content as a reliable plain-text string."""
-    if lesson is None:
-        return ""
-
-    if isinstance(lesson, str):
-        return lesson.strip()
-
-    if isinstance(lesson, dict):
-        for key in ("content", "text", "lesson", "output_text", "response"):
-            value = lesson.get(key)
-            if isinstance(value, str) and value.strip():
-                return value.strip()
-
-        choices = lesson.get("choices")
-        if isinstance(choices, list) and choices:
-            first = choices[0]
-            if isinstance(first, dict):
-                message = first.get("message", {})
-                if isinstance(message, dict):
-                    content = message.get("content")
-                    if isinstance(content, str):
-                        return content.strip()
-
-    output_text = getattr(lesson, "output_text", None)
-    if isinstance(output_text, str) and output_text.strip():
-        return output_text.strip()
-
-    choices = getattr(lesson, "choices", None)
-    if choices:
-        first = choices[0]
-        message = getattr(first, "message", None)
-        content = getattr(message, "content", None)
-        if isinstance(content, str):
-            return content.strip()
-
-    return str(lesson).strip()
-
-
-# --------------------------------------------------
 # PAGE CONFIGURATION
 # --------------------------------------------------
 
@@ -92,7 +49,7 @@ st.markdown(
         background-color: #003366;
         color: white;
         border-radius: 10px;
-        min-height: 55px;
+        height: 55px;
         font-size: 18px;
         font-weight: bold;
     }
@@ -102,10 +59,29 @@ st.markdown(
         color: white;
     }
 
-
     </style>
     """,
     unsafe_allow_html=True
+)
+
+
+# --------------------------------------------------
+# SIDEBAR
+# --------------------------------------------------
+
+st.sidebar.image(
+    "https://img.icons8.com/color/96/graduation-cap.png",
+    width=80
+)
+
+st.sidebar.markdown("## ELT Planner AI")
+
+st.sidebar.info(
+    """
+    Use this application to generate professionally structured,
+    differentiated and Bloom's Taxonomy-based English language
+    lesson plans.
+    """
 )
 
 
@@ -121,7 +97,7 @@ st.markdown(
 
     Design engaging, Bloom's Taxonomy-based lesson plans in minutes.
 
-    Upload your Course Outline or enter your Course Objectives and CLOs,
+    Upload your course outline or enter your course objectives and CLOs,
     select your programme, choose your lesson topic, and let AI generate
     a professional lesson plan.
     """
@@ -139,6 +115,7 @@ st.markdown("## 📘 Step 1 — Course Information")
 col1, col2 = st.columns(2)
 
 with col1:
+
     course = st.selectbox(
         "Course Title",
         [
@@ -155,6 +132,9 @@ with col1:
         "Programme",
         [
             "Computer Science",
+            "Software Engineering",
+            "Data Science",
+            "Artificial Intelligence",
             "Electrical Engineering",
             "Civil Engineering",
             "Business Administration",
@@ -174,6 +154,7 @@ with col1:
     )
 
 with col2:
+
     duration = st.selectbox(
         "Lesson Duration",
         [
@@ -188,7 +169,8 @@ with col2:
         "Class Size",
         min_value=5,
         max_value=150,
-        value=30
+        value=30,
+        step=1
     )
 
     proficiency = st.selectbox(
@@ -211,14 +193,13 @@ st.divider()
 st.markdown("## 📄 Step 2 — Curriculum Alignment")
 
 uploaded_file = st.file_uploader(
-    "Upload Course Outline (PDF or DOCX)",
-    type=["pdf", "docx"]
+    "Upload Course Outline",
+    type=["pdf", "docx"],
+    help="Upload a PDF or DOCX course outline."
 )
 
 if uploaded_file is not None:
-    st.success(
-        f"File uploaded successfully: {uploaded_file.name}"
-    )
+    st.success(f"Uploaded: {uploaded_file.name}")
 
 st.markdown("### OR")
 
@@ -226,33 +207,27 @@ course_objectives = st.text_area(
     "Paste Course Objectives",
     height=180,
     placeholder="""
-Example
+Example:
 
-CO1:
-Develop academic reading skills.
+CO1: Develop academic reading skills.
 
-CO2:
-Develop effective academic writing.
+CO2: Develop effective academic writing skills.
 
-CO3:
-Develop communication skills.
+CO3: Develop professional communication skills.
 """
 )
 
 clos = st.text_area(
-    "Paste Course Learning Outcomes (CLOs)",
+    "Paste Course Learning Outcomes",
     height=180,
     placeholder="""
-Example
+Example:
 
-CLO1:
-Identify important features of academic texts.
+CLO1: Identify the main features of effective academic writing.
 
-CLO2:
-Apply appropriate language strategies.
+CLO2: Apply appropriate writing strategies in academic tasks.
 
-CLO3:
-Evaluate written communication for clarity and accuracy.
+CLO3: Evaluate written texts for clarity, organisation and accuracy.
 """
 )
 
@@ -306,26 +281,58 @@ topics = {
         "Debate",
         "Interview Skills",
         "Extempore Speaking"
+    ],
+
+    "Grammar": [
+        "Parts of Speech",
+        "Sentence Structure",
+        "Subject-Verb Agreement",
+        "Tenses",
+        "Active and Passive Voice",
+        "Direct and Indirect Speech",
+        "Clauses",
+        "Punctuation"
     ]
 }
 
 col1, col2 = st.columns(2)
 
 with col1:
+
     skill = st.selectbox(
         "Language Skill",
         list(topics.keys())
     )
 
+    lesson_focus = st.selectbox(
+        "Lesson Focus",
+        [
+            "Teaching New Concept",
+            "Revision",
+            "Practice",
+            "Exam Preparation",
+            "Assessment",
+            "Project Lesson"
+        ]
+    )
+
 with col2:
+
     topic = st.selectbox(
         "Lesson Topic",
         topics[skill]
     )
 
+    custom_topic = st.text_input(
+        "Custom Topic Optional",
+        placeholder="Enter a topic not listed above"
+    )
+
+final_topic = custom_topic.strip() if custom_topic.strip() else topic
+
 
 # --------------------------------------------------
-# ACTIVITIES TO GENERATE
+# ACTIVITY OPTIONS
 # --------------------------------------------------
 
 st.markdown("### 🎯 Activities to Generate")
@@ -333,6 +340,7 @@ st.markdown("### 🎯 Activities to Generate")
 activity_col1, activity_col2 = st.columns(2)
 
 with activity_col1:
+
     beginner_activity = st.checkbox(
         "🟢 Beginner Activity",
         value=True
@@ -349,22 +357,24 @@ with activity_col1:
     )
 
 with activity_col2:
+
     activity_bullet_points = st.checkbox(
-        "• Present differentiated activities in bullet points",
+        "• Present activities in bullet points",
         value=True,
         help=(
-            "Each differentiated activity will be shown using "
-            "clear but sufficiently detailed bullet points."
+            "The AI will present each activity using short, "
+            "clear and readable bullet points."
         )
     )
 
-    detailed_table = st.checkbox(
-        "📋 Keep lesson procedure detailed in table form",
-        value=True,
-        help=(
-            "Teacher actions, student actions, resources and "
-            "assessment instructions will remain detailed."
-        )
+    include_teacher_role = st.checkbox(
+        "Include teacher and student roles",
+        value=True
+    )
+
+    include_activity_assessment = st.checkbox(
+        "Include assessment for each activity",
+        value=True
     )
 
 
@@ -379,19 +389,6 @@ if intermediate_activity:
 if advanced_activity:
     selected_activities.append("Advanced")
 
-
-lesson_focus = st.selectbox(
-    "Lesson Focus",
-    [
-        "Teaching New Concept",
-        "Revision",
-        "Practice",
-        "Exam Preparation",
-        "Assessment",
-        "Project Lesson"
-    ]
-)
-
 st.divider()
 
 
@@ -404,6 +401,7 @@ st.markdown("## 👨‍🏫 Step 4 — Teaching Context")
 col1, col2 = st.columns(2)
 
 with col1:
+
     delivery = st.selectbox(
         "Teaching Mode",
         [
@@ -414,8 +412,9 @@ with col1:
     )
 
 with col2:
+
     learning_style = st.multiselect(
-        "Preferred Learning Strategy",
+        "Preferred Learning Strategies",
         [
             "Individual Learning",
             "Pair Work",
@@ -423,7 +422,14 @@ with col2:
             "Collaborative Learning",
             "Think-Pair-Share",
             "Problem-Based Learning",
-            "Inquiry-Based Learning"
+            "Inquiry-Based Learning",
+            "Peer Teaching",
+            "Task-Based Learning"
+        ],
+        default=[
+            "Individual Learning",
+            "Pair Work",
+            "Group Work"
         ]
     )
 
@@ -435,7 +441,14 @@ resources = st.multiselect(
         "Whiteboard",
         "Printed Handouts",
         "AI Tools",
-        "Smart Classroom"
+        "Smart Classroom",
+        "Student Mobile Phones",
+        "Learning Management System"
+    ],
+    default=[
+        "Projector",
+        "Whiteboard",
+        "Printed Handouts"
     ]
 )
 
@@ -476,30 +489,31 @@ st.divider()
 
 
 # --------------------------------------------------
-# STEP 6 — AI PROMPT
+# STEP 6 — AI TEACHING INSTRUCTIONS
 # --------------------------------------------------
 
 st.markdown("## 🤖 Step 6 — AI Teaching Instructions")
 
 teacher_prompt = st.text_area(
-    "Additional Instructions (Optional)",
+    "Additional Instructions Optional",
     height=220,
     placeholder="""
-Example
+Example:
 
 Develop an interactive lesson.
 
+Use authentic examples from Computer Science.
+
+Include retrieval practice.
+
 Include collaborative learning.
 
-Use authentic Computer Science examples.
-
-Include formative assessment.
+Add formative assessment.
 
 Add an exit ticket.
 
-Provide three differentiated activities.
-
-Align everything with Bloom's Taxonomy.
+Ensure constructive alignment between objectives,
+activities and assessment.
 """
 )
 
@@ -535,75 +549,63 @@ generate = st.button(
 )
 
 if generate:
-    if not selected_activities:
-        st.error(
-            "Please select at least one activity level."
-        )
 
-    elif not blooms:
-        st.error(
+    validation_errors = []
+
+    if not blooms:
+        validation_errors.append(
             "Please select at least one Bloom's Taxonomy level."
         )
 
+    if not selected_activities:
+        validation_errors.append(
+            "Please select at least one activity level."
+        )
+
+    if validation_errors:
+        for error in validation_errors:
+            st.error(error)
+
     else:
-        with st.spinner(
-            "Generating your professional lesson plan..."
-        ):
+
+        with st.spinner("Generating your professional lesson plan..."):
+
             try:
                 prompt = build_prompt(
-                    course,
-                    programme,
-                    year,
-                    duration,
-                    class_size,
-                    proficiency,
-                    course_objectives,
-                    clos,
-                    skill,
-                    topic,
-                    lesson_focus,
-                    delivery,
-                    learning_style,
-                    resources,
-                    blooms,
-                    teacher_prompt,
-                    selected_activities,
-                    activity_bullet_points,
-                    detailed_table
+                    course=course,
+                    programme=programme,
+                    year=year,
+                    duration=duration,
+                    class_size=class_size,
+                    proficiency=proficiency,
+                    course_objectives=course_objectives,
+                    clos=clos,
+                    skill=skill,
+                    topic=final_topic,
+                    lesson_focus=lesson_focus,
+                    delivery=delivery,
+                    learning_style=learning_style,
+                    resources=resources,
+                    blooms=blooms,
+                    teacher_prompt=teacher_prompt,
+                    selected_activities=selected_activities,
+                    activity_bullet_points=activity_bullet_points,
+                    include_teacher_role=include_teacher_role,
+                    include_activity_assessment=include_activity_assessment
                 )
 
-                raw_lesson = generate_lesson(prompt)
-                lesson = normalize_lesson_text(raw_lesson)
+                lesson = generate_lesson(prompt)
 
-                if not lesson:
-                    raise ValueError("The AI returned an empty lesson plan.")
+                st.success("Lesson generated successfully!")
 
-                st.session_state["generated_lesson"] = lesson
+                st.markdown("---")
 
-                st.success(
-                    "Lesson Generated Successfully!"
-                )
+                st.markdown("## 📚 Generated Lesson Plan")
+
+                st.markdown(lesson)
 
             except Exception as error:
                 st.error(
                     "The lesson plan could not be generated. "
                     f"Error: {error}"
                 )
-
-
-# --------------------------------------------------
-# DISPLAY GENERATED LESSON
-# --------------------------------------------------
-
-if "generated_lesson" in st.session_state:
-    lesson = normalize_lesson_text(
-        st.session_state["generated_lesson"]
-    )
-
-    if not lesson:
-        st.error("No lesson-plan content is available to display.")
-        st.stop()
-
-    st.markdown("---")
-    st.markdown("## 📚 Generated Lesson Plan")
-    st.markdown(lesson)
