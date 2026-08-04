@@ -1,22 +1,8 @@
-
 import streamlit as st
 
 from io import BytesIO
 from docx import Document
 from docx.shared import Inches, Pt
-
-from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import (
-    SimpleDocTemplate,
-    Paragraph,
-    Spacer,
-    Table,
-    TableStyle
-)
-
 from prompts import build_prompt
 from lesson_generator import generate_lesson
 
@@ -27,7 +13,7 @@ from lesson_generator import generate_lesson
 
 def clean_markdown_text(text):
     """
-    Remove common Markdown formatting for Word and PDF files.
+    Remove common Markdown formatting for the Word file.
     """
     if not text:
         return ""
@@ -240,295 +226,6 @@ def markdown_to_word(lesson_text):
 
     output = BytesIO()
     document.save(output)
-    output.seek(0)
-
-    return output.getvalue()
-
-
-def markdown_to_pdf(lesson_text):
-    """
-    Convert generated Markdown lesson-plan content into a PDF.
-    """
-    output = BytesIO()
-
-    pdf_document = SimpleDocTemplate(
-        output,
-        pagesize=landscape(A4),
-        rightMargin=24,
-        leftMargin=24,
-        topMargin=24,
-        bottomMargin=24
-    )
-
-    styles = getSampleStyleSheet()
-
-    title_style = ParagraphStyle(
-        "LessonTitle",
-        parent=styles["Title"],
-        fontSize=18,
-        leading=22,
-        alignment=TA_CENTER,
-        spaceAfter=12
-    )
-
-    heading_style = ParagraphStyle(
-        "LessonHeading",
-        parent=styles["Heading2"],
-        fontSize=12,
-        leading=15,
-        spaceBefore=8,
-        spaceAfter=5
-    )
-
-    body_style = ParagraphStyle(
-        "LessonBody",
-        parent=styles["BodyText"],
-        fontSize=8,
-        leading=11,
-        spaceAfter=4
-    )
-
-    bullet_style = ParagraphStyle(
-        "LessonBullet",
-        parent=body_style,
-        leftIndent=14,
-        firstLineIndent=-8,
-        bulletIndent=5
-    )
-
-    table_header_style = ParagraphStyle(
-        "TableHeader",
-        parent=body_style,
-        fontSize=7,
-        leading=9,
-        alignment=TA_CENTER,
-        textColor=colors.white
-    )
-
-    table_cell_style = ParagraphStyle(
-        "TableCell",
-        parent=body_style,
-        fontSize=6.5,
-        leading=8
-    )
-
-    story = [
-        Paragraph("ELT Lesson Plan", title_style),
-        Spacer(1, 8)
-    ]
-
-    lines = lesson_text.splitlines()
-    index = 0
-
-    while index < len(lines):
-        line = lines[index].strip()
-
-        if not line:
-            index += 1
-            continue
-
-        # ------------------------------------------
-        # MARKDOWN TABLE
-        # ------------------------------------------
-
-        if (
-            line.startswith("|")
-            and line.endswith("|")
-            and line.count("|") >= 2
-        ):
-            table_lines = []
-
-            while index < len(lines):
-                current_line = lines[index].strip()
-
-                if (
-                    current_line.startswith("|")
-                    and current_line.endswith("|")
-                ):
-                    table_lines.append(current_line)
-                    index += 1
-                else:
-                    break
-
-            rows = []
-
-            for table_line in table_lines:
-                cells = [
-                    clean_markdown_text(cell.strip())
-                    for cell in table_line.strip("|").split("|")
-                ]
-
-                if not is_markdown_separator_row(cells):
-                    rows.append(cells)
-
-            if rows:
-                column_count = max(len(row) for row in rows)
-
-                formatted_rows = []
-
-                for row_index, row in enumerate(rows):
-                    paragraph_style = (
-                        table_header_style
-                        if row_index == 0
-                        else table_cell_style
-                    )
-
-                    padded_row = row + [""] * (
-                        column_count - len(row)
-                    )
-
-                    formatted_rows.append([
-                        Paragraph(cell, paragraph_style)
-                        for cell in padded_row
-                    ])
-
-                available_width = landscape(A4)[0] - 48
-
-                if column_count == 5:
-                    column_widths = [
-                        available_width * 0.08,
-                        available_width * 0.30,
-                        available_width * 0.30,
-                        available_width * 0.20,
-                        available_width * 0.12
-                    ]
-
-                elif column_count == 4:
-                    column_widths = [
-                        available_width * 0.18,
-                        available_width * 0.34,
-                        available_width * 0.28,
-                        available_width * 0.20
-                    ]
-
-                else:
-                    column_widths = [
-                        available_width / column_count
-                    ] * column_count
-
-                pdf_table = Table(
-                    formatted_rows,
-                    colWidths=column_widths,
-                    repeatRows=1
-                )
-
-                pdf_table.setStyle(
-                    TableStyle([
-                        (
-                            "BACKGROUND",
-                            (0, 0),
-                            (-1, 0),
-                            colors.HexColor("#003366")
-                        ),
-                        (
-                            "TEXTCOLOR",
-                            (0, 0),
-                            (-1, 0),
-                            colors.white
-                        ),
-                        (
-                            "FONTNAME",
-                            (0, 0),
-                            (-1, 0),
-                            "Helvetica-Bold"
-                        ),
-                        (
-                            "VALIGN",
-                            (0, 0),
-                            (-1, -1),
-                            "TOP"
-                        ),
-                        (
-                            "GRID",
-                            (0, 0),
-                            (-1, -1),
-                            0.5,
-                            colors.grey
-                        ),
-                        (
-                            "ROWBACKGROUNDS",
-                            (0, 1),
-                            (-1, -1),
-                            [
-                                colors.white,
-                                colors.HexColor("#F2F5F8")
-                            ]
-                        ),
-                        (
-                            "LEFTPADDING",
-                            (0, 0),
-                            (-1, -1),
-                            4
-                        ),
-                        (
-                            "RIGHTPADDING",
-                            (0, 0),
-                            (-1, -1),
-                            4
-                        ),
-                        (
-                            "TOPPADDING",
-                            (0, 0),
-                            (-1, -1),
-                            4
-                        ),
-                        (
-                            "BOTTOMPADDING",
-                            (0, 0),
-                            (-1, -1),
-                            4
-                        )
-                    ])
-                )
-
-                story.append(pdf_table)
-                story.append(Spacer(1, 10))
-
-            continue
-
-        # ------------------------------------------
-        # HEADINGS
-        # ------------------------------------------
-
-        if line.startswith("#"):
-            heading_text = clean_markdown_text(line)
-
-            if heading_text.lower() != "lesson plan":
-                story.append(
-                    Paragraph(
-                        heading_text,
-                        heading_style
-                    )
-                )
-
-        # ------------------------------------------
-        # BULLET POINTS
-        # ------------------------------------------
-
-        elif line.startswith("- ") or line.startswith("* "):
-            story.append(
-                Paragraph(
-                    "• " + clean_markdown_text(line[2:]),
-                    bullet_style
-                )
-            )
-
-        # ------------------------------------------
-        # NORMAL TEXT
-        # ------------------------------------------
-
-        else:
-            story.append(
-                Paragraph(
-                    clean_markdown_text(line),
-                    body_style
-                )
-            )
-
-        index += 1
-
-    pdf_document.build(story)
-
     output.seek(0)
 
     return output.getvalue()
@@ -1087,40 +784,25 @@ if "generated_lesson" in st.session_state:
     lesson = st.session_state["generated_lesson"]
 
     st.markdown("---")
-
     st.markdown("## 📚 Generated Lesson Plan")
-
     st.markdown(lesson)
 
     try:
         word_file = markdown_to_word(lesson)
-        pdf_file = markdown_to_pdf(lesson)
 
-        download_col1, download_col2 = st.columns(2)
-
-        with download_col1:
-            st.download_button(
-                label="📘 Download Lesson Plan as Word",
-                data=word_file,
-                file_name="ELT_Lesson_Plan.docx",
-                mime=(
-                    "application/vnd.openxmlformats-officedocument."
-                    "wordprocessingml.document"
-                ),
-                use_container_width=True
-            )
-
-        with download_col2:
-            st.download_button(
-                label="📕 Download Lesson Plan as PDF",
-                data=pdf_file,
-                file_name="ELT_Lesson_Plan.pdf",
-                mime="application/pdf",
-                use_container_width=True
-            )
+        st.download_button(
+            label="📘 Download Lesson Plan as Word",
+            data=word_file,
+            file_name="ELT_Lesson_Plan.docx",
+            mime=(
+                "application/vnd.openxmlformats-officedocument."
+                "wordprocessingml.document"
+            ),
+            use_container_width=True
+        )
 
     except Exception as export_error:
         st.warning(
-            "The lesson plan was generated, but the Word or PDF "
-            f"file could not be created. Error: {export_error}"
+            "The lesson plan was generated, but the Word file "
+            f"could not be created. Error: {export_error}"
         )
