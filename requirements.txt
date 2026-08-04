@@ -1,5 +1,5 @@
-streamlit
-openai
+streamlit>=1.40.0
+openai>=1.68.0
 python-docx
 pdfplumber
 PyPDF2
