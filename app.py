@@ -266,8 +266,7 @@ with col2:
         "Lesson Topic",
         topics[skill]
     )
-
-  st.markdown("### Activities to Generate")
+st.markdown("### Activities to Generate")
 
 beginner_activity = st.checkbox(
     "🟢 Beginner Activity",
