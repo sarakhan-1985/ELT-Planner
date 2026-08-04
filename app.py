@@ -1124,4 +1124,3 @@ if "generated_lesson" in st.session_state:
             "The lesson plan was generated, but the Word or PDF "
             f"file could not be created. Error: {export_error}"
         )
-```
