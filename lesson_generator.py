@@ -1,91 +1,39 @@
-# lesson_generator.py
-
 from openai import OpenAI
 import streamlit as st
 
 
 def generate_lesson(prompt):
-    """
-    Sends the lesson prompt to OpenAI
-    and returns the generated lesson.
-    """
 
     try:
+        api_key = st.secrets.get("OPENAI_API_KEY")
 
-        client = OpenAI(
-            api_key=st.secrets["OPENAI_API_KEY"]
-        )
+        if not api_key:
+            return "❌ OPENAI_API_KEY is missing from Streamlit Secrets."
 
-        response = client.chat.completions.create(
+        client = OpenAI(api_key=api_key)
 
+        response = client.responses.create(
             model="gpt-5-mini",
+            instructions="""
+You are an expert English Language Teaching curriculum designer.
 
-            messages=[
+Create a professional, practical, classroom-ready university
+English lesson plan.
 
-                {
-                    "role": "system",
-                    "content": """
-You are one of the world's best English Language Teaching experts.
+Follow the structure and instructions supplied by the user.
 
-You are an expert in:
-
-• Lesson Planning
-• Bloom's Taxonomy
-• English Language Teaching
-• Higher Education
-• Curriculum Design
-• Active Learning
-• Differentiated Instruction
-• Constructive Alignment
-
-Always produce lesson plans suitable for university teachers.
-
-The lesson should be:
-
-- Professional
-- Practical
-- Detailed
-- Classroom-ready
-- Fully aligned with the provided Course Objectives and CLOs
-
-Always include:
-
-- Lesson Overview
-- Learning Objectives
-- Success Criteria
-- Prior Knowledge
-- Materials Required
-- Lesson Plan Table
-- Guided Practice
-- Beginner Activity
-- Intermediate Activity
-- Advanced Activity
-- Formative Assessment
-- Exit Ticket
-- Homework
-- Teacher Reflection
-
-Return ONLY the lesson plan in Markdown.
-
-Do not include any explanations or introductory text.
-"""
-                },
-
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-
-            ],
-
-            max_completion_tokens=4000
-
+Return only the lesson plan in Markdown.
+""",
+            input=prompt,
+            max_output_tokens=6000
         )
 
-        lesson = response.choices[0].message.content
+        lesson = response.output_text
+
+        if not lesson:
+            return "❌ OpenAI returned an empty lesson plan."
 
         return lesson
 
     except Exception as e:
-
-        return f"❌ Error\n\n{e}"
+        return f"❌ Lesson generation failed:\n\n{str(e)}"
