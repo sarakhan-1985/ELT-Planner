@@ -526,34 +526,44 @@ generate = st.button(
 
 if generate:
 
-    with st.spinner("Generating your lesson..."):
+    if not course_objectives.strip():
+        st.error("Please enter the Course Objectives.")
 
-        prompt = build_prompt(
+    elif not clos.strip():
+        st.error("Please enter the Course Learning Outcomes.")
 
-            course,
-            programme,
-            year,
-            duration,
-            class_size,
-            proficiency,
-            course_objectives,
-            clos,
-            skill,
-            topic,
-            lesson_focus,
-            delivery,
-            learning_style,
-            resources,
-            blooms,
-            teacher_prompt
+    elif not blooms:
+        st.error("Please select at least one Bloom's Taxonomy level.")
 
-        )
+    else:
 
-        lesson = generate_lesson(prompt)
+        with st.spinner("Generating your lesson..."):
 
-        st.success("Lesson Generated Successfully!")
+            prompt = build_prompt(
+                course,
+                programme,
+                year,
+                duration,
+                class_size,
+                proficiency,
+                course_objectives,
+                clos,
+                skill,
+                topic,
+                lesson_focus,
+                delivery,
+                learning_style,
+                resources,
+                blooms,
+                teacher_prompt
+            )
+
+            lesson = generate_lesson(prompt)
 
         st.markdown("---")
 
-        st.markdown(lesson)
-
+        if lesson.startswith("❌"):
+            st.error(lesson)
+        else:
+            st.success("Lesson Generated Successfully!")
+            st.markdown(lesson)
